@@ -2,6 +2,7 @@ import random
 import time
 import multiprocessing
 from pynput.mouse import Controller
+from decimal import Decimal
 
 
 class ThreadExperiment:
@@ -10,10 +11,15 @@ class ThreadExperiment:
 
     @staticmethod
     def get_rand_mouse():
-        mouse = Controller()
+        x = 1055373 * 73  # VLÁKNO FREKVENCA * poslední dvě čísla
+        y1 = 1845911 * 685 * 431314  # prvá část výsledku z cat /proc/stat | grep "cpu7" -- 7 je id
+        y2 = 13189725 * 136186 * 82482 * 52843  # druhá část z cat atd.
+        mouse = Controller()# poměrně přímočaré, co to je :)
         position = mouse.position
-        x = random.getrandbits(128)
-        random_num = int(position[0] + position[1]) * int(x * position[1] + position[0] % position[0])
+        a = int(position[0])
+        b = int(position[1])
+        random_num = (a ** b % y2)**3 * (y1 * x) ** 3
+
         return random_num
 
     @staticmethod
@@ -25,7 +31,6 @@ class ThreadExperiment:
         # Vybere se jedna z pozic cursoru, zde je možné a vhodné využít random.choice (přece jen jsou jen dvě možnosti)
         random_choice = random.choice([0, 1])
         cursor_value = position[random_choice]
-
 
         # Nastavení možné odchylky vygenerovaného čísla od random_num proměnné, ke které je potřeba se dostat
         # Momentálně 0.1% odchylka z obou směrů-- 0.999 a 1.001
@@ -93,7 +98,5 @@ class ThreadExperiment:
         # Rand. num. guess output summary:
         print("\nSummary of tasks in order of thread completion:")
         for task_id, random_num, final_value, attempts, duration in sorted_summary:
-            print(f"Task {task_id} - Random number: {random_num}, Final value: {final_value}, Attempts: {attempts}, Duration: {duration:.4f} seconds")
-
-
-
+            print(
+                f"Task {task_id} - Random number: {random_num}, Final value: {final_value}, Attempts: {attempts}, Duration: {duration:.4f} seconds")
